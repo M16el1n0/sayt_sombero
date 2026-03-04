@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOMBERO | База знаний</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0f0f13;--sidebar-bg:#15151c;--card-bg:#1a1a24;--border:#2a2a3a;--accent:#9b6dff;--accent2:#ff6db3;--text:#e8e8f0;--text-muted:#7a7a9a;--text-dim:#4a4a6a; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+  header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(15,15,19,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:60px}
+  .logo{display:flex;align-items:center;gap:10px;font-family:'Unbounded',sans-serif;font-weight:700;font-size:15px;color:var(--text);text-decoration:none;cursor:pointer}
+  .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+  .logo span{color:var(--text-muted);font-weight:300;font-size:13px}
+  .search-bar{display:flex;align-items:center;gap:8px;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:8px 14px;width:260px;transition:border-color .2s}
+  .search-bar:hover{border-color:var(--accent)}
+  .search-bar input{background:none;border:none;outline:none;color:var(--text-muted);font-size:13px;width:100%;font-family:'Inter',sans-serif}
+  .search-bar svg{opacity:.4;flex-shrink:0}
+  kbd{background:var(--border);border-radius:5px;padding:2px 7px;font-size:11px;color:var(--text-muted);font-family:'Inter',sans-serif}
+  .burger{display:none;background:none;border:none;color:var(--text);cursor:pointer;padding:4px}
+  .layout{display:flex;margin-top:60px;min-height:calc(100vh - 60px)}
+  aside{width:260px;background:var(--sidebar-bg);border-right:1px solid var(--border);position:fixed;top:60px;left:0;bottom:0;overflow-y:auto;padding:20px 0}
+  aside::-webkit-scrollbar{width:4px}
+  aside::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+  .nav-section{margin-bottom:6px}
+  .nav-section-title{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);padding:8px 20px 4px}
+  .nav-link{display:flex;align-items:center;gap:8px;padding:8px 20px;color:var(--text-muted);text-decoration:none;font-size:13.5px;transition:all .15s;cursor:pointer;border-left:2px solid transparent}
+  .nav-link:hover{color:var(--text);background:rgba(155,109,255,.06);border-left-color:var(--accent)}
+  .nav-link.active{color:var(--accent);background:rgba(155,109,255,.1);border-left-color:var(--accent)}
+  .nav-link .icon{font-size:15px;width:20px;text-align:center}
+  main{margin-left:260px;flex:1;padding:48px 64px;max-width:900px}
+  .breadcrumb{display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:12px;margin-bottom:28px}
+  .breadcrumb a{color:var(--accent);text-decoration:none;cursor:pointer}
+  .article-title{font-family:'Unbounded',sans-serif;font-size:26px;font-weight:700;line-height:1.3;margin-bottom:8px;background:linear-gradient(135deg,var(--text) 60%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .article-meta{color:var(--text-dim);font-size:12px;margin-bottom:36px;display:flex;gap:16px}
+  .divider{height:1px;background:var(--border);margin:32px 0}
+  h2{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:600;color:var(--text);margin:36px 0 16px}
+  p{font-size:14.5px;line-height:1.75;color:#c0c0d8;margin-bottom:14px}
+  .step-card{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin:12px 0;display:flex;gap:16px;align-items:flex-start;transition:border-color .2s,transform .2s}
+  .step-card:hover{border-color:var(--accent);transform:translateX(4px)}
+  .step-num{width:34px;height:34px;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;color:#fff}
+  .step-content h4{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px}
+  .step-content p{font-size:13.5px;color:var(--text-muted);margin:0}
+  .tip-box{background:rgba(155,109,255,.08);border:1px solid rgba(155,109,255,.25);border-radius:12px;padding:16px 20px;margin:20px 0;display:flex;gap:12px;align-items:flex-start}
+  .tip-box .tip-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+  .tip-box p{font-size:13.5px;color:#b8a8e8;margin:0}
+  .warn-box{background:rgba(255,109,109,.07);border:1px solid rgba(255,109,109,.2);border-radius:12px;padding:16px 20px;margin:20px 0;display:flex;gap:12px;align-items:flex-start}
+  .warn-box .tip-icon{font-size:18px;flex-shrink:0}
+  .warn-box p{font-size:13.5px;color:#e8a8a8;margin:0}
+  .success-box{background:rgba(109,255,180,.07);border:1px solid rgba(109,255,180,.2);border-radius:12px;padding:16px 20px;margin:20px 0;display:flex;gap:12px;align-items:flex-start}
+  .success-box .tip-icon{font-size:18px;flex-shrink:0}
+  .success-box p{font-size:13.5px;color:#a8e8c8;margin:0}
+  .price-table{width:100%;border-collapse:collapse;margin:16px 0;border-radius:12px;overflow:hidden}
+  .price-table th{background:var(--card-bg);padding:12px 16px;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);border-bottom:1px solid var(--border)}
+  .price-table td{padding:12px 16px;font-size:13.5px;border-bottom:1px solid var(--border);color:#c0c0d8}
+  .price-table tr:last-child td{border-bottom:none}
+  .price-table tr:hover td{background:rgba(155,109,255,.05)}
+  .price-table .price{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:600;color:var(--accent)}
+  .tag{display:inline-block;background:rgba(155,109,255,.15);color:var(--accent);border-radius:6px;padding:2px 9px;font-size:12px;font-weight:500}
+  .platform-card{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:24px;margin:16px 0}
+  .platform-card-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .platform-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(155,109,255,.12)}
+  .platform-name{font-family:'Unbounded',sans-serif;font-size:15px;font-weight:600}
+  .platform-price{font-family:'Unbounded',sans-serif;font-size:22px;font-weight:700;color:var(--accent);margin:12px 0 4px}
+  .req-list{list-style:none}
+  .req-list li{padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;color:#c0c0d8;display:flex;gap:10px;align-items:flex-start}
+  .req-list li:last-child{border-bottom:none}
+  .req-list li::before{content:"→";color:var(--accent);font-weight:700;flex-shrink:0;margin-top:1px}
+  .faq-item{border:1px solid var(--border);border-radius:12px;margin:10px 0;overflow:hidden}
+  .faq-q{padding:16px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;color:var(--text);background:var(--card-bg);transition:background .2s}
+  .faq-q:hover{background:rgba(155,109,255,.08)}
+  .faq-a{padding:0 20px;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s;font-size:13.5px;color:var(--text-muted);line-height:1.7}
+  .faq-a.open{max-height:300px;padding:16px 20px}
+  .faq-arrow{transition:transform .3s;font-size:12px;color:var(--text-muted)}
+  .faq-arrow.open{transform:rotate(180deg)}
+  @media(max-width:900px){aside{transform:translateX(-100%);transition:transform .25s;z-index:90}aside.open{transform:translateX(0)}main{margin-left:0;padding:32px 20px}.burger{display:block}.search-bar{width:140px}kbd{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" onclick="showPage('home')">
+    <div class="logo-icon">🎩</div>SOMBERO <span>// ЗАДАНИЯ</span>
+  </div>
+  <div class="search-bar">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Поиск..."><kbd>Ctrl K</kbd>
+  </div>
+  <button class="burger" onclick="document.querySelector('aside').classList.toggle('open')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+</header>
+<div class="layout">
+<aside>
+  <div class="nav-section">
+    <div class="nav-section-title">Главное</div>
+    <a class="nav-link" onclick="showPage('home',this)"><span class="icon">🏠</span>Главная</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Начало работы</div>
+    <a class="nav-link active" onclick="showPage('start',this)"><span class="icon">🚀</span>Как начать зарабатывать</a>
+    <a class="nav-link" onclick="showPage('pick',this)"><span class="icon">📋</span>Как брать задания</a>
+    <a class="nav-link" onclick="showPage('req',this)"><span class="icon">✅</span>Требования к аккаунтам</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Платформы</div>
+    <a class="nav-link" onclick="showPage('yandex',this)"><span class="icon">🗺️</span>Я.Карты</a>
+    <a class="nav-link" onclick="showPage('avito',this)"><span class="icon">🏷️</span>Авито</a>
+    <a class="nav-link" onclick="showPage('google',this)"><span class="icon">🌍</span>Гугл Карты</a>
+    <a class="nav-link" onclick="showPage('2gis',this)"><span class="icon">📍</span>2ГИС</a>
+    <a class="nav-link" onclick="showPage('vk',this)"><span class="icon">💙</span>ВКонтакте</a>
+    <a class="nav-link" onclick="showPage('profi',this)"><span class="icon">🛠️</span>Профи.ру / Отзовик</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Выплаты</div>
+    <a class="nav-link" onclick="showPage('pay',this)"><span class="icon">💸</span>Как получить выплату</a>
+    <a class="nav-link" onclick="showPage('terms',this)"><span class="icon">⏱️</span>Условия и сроки</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Помощь</div>
+    <a class="nav-link" onclick="showPage('faq',this)"><span class="icon">❓</span>FAQ</a>
+    <a class="nav-link" onclick="showPage('support',this)"><span class="icon">💬</span>Поддержка</a>
+  </div>
+</aside>
+<main>
+
+<div id="p-home" style="display:none">
+  <h1 class="article-title">База знаний Sombero</h1>
+  <div class="article-meta"><span>🎩 Добро пожаловать</span></div>
+  <p>Здесь собрана вся необходимая информация для работы с биржей заданий Sombero. Выбери нужный раздел в меню слева.</p>
+  <div class="divider"></div>
+  <h2>С чего начать?</h2>
+  <div class="step-card"><div class="step-num">1</div><div class="step-content"><h4>Прочитай «Как начать зарабатывать»</h4><p>Там описан весь процесс от подписки до получения выплаты.</p></div></div>
+  <div class="step-card"><div class="step-num">2</div><div class="step-content"><h4>Изучи требования к аккаунтам</h4><p>Узнай, какие аккаунты подходят для выполнения заданий.</p></div></div>
+  <div class="step-card"><div class="step-num">3</div><div class="step-content"><h4>Выбери платформу</h4><p>Ознакомься с инструкциями по каждой платформе отдельно.</p></div></div>
+  <div class="tip-box"><span class="tip-icon">💡</span><p>Если не нашёл ответ — напиши в поддержку. Мы отвечаем быстро.</p></div>
+</div>
+
+<div id="p-start">
+  <div class="breadcrumb"><a onclick="showPage('home')">Главная</a> › <span>Как начать зарабатывать</span></div>
+  <h1 class="article-title">Как начать зарабатывать на отзывах</h1>
+  <div class="article-meta"><span>📖 ~3 мин</span><span>🔄 Актуально</span></div>
+  <p>Sombero — биржа заданий, где ты зарабатываешь, оставляя отзывы о компаниях на разных платформах. Просто берёшь задание, выполняешь по инструкции и получаешь оплату.</p>
+  <div class="tip-box"><span class="tip-icon">💡</span><p>Для старта нужен только Telegram. Никаких вложений — всё бесплатно.</p></div>
+  <div class="divider"></div>
+  <h2>Шаги для начала работы</h2>
+  <div class="step-card"><div class="step-num">1</div><div class="step-content"><h4>Подпишись на канал</h4><p>Перейди в Telegram-канал <strong>@millionnovosti</strong> и подпишись. Включи уведомления, чтобы не пропускать задания.</p></div></div>
+  <div class="step-card"><div class="step-num">2</div><div class="step-content"><h4>Найди подходящее задание</h4><p>В канале публикуются посты с заданиями: платформа, оплата и что нужно сделать.</p></div></div>
+  <div class="step-card"><div class="step-num">3</div><div class="step-content"><h4>Откликнись</h4><p>Нажми <strong>«Откликнуться»</strong> под постом. Откроется чат с администратором — напиши о готовности взять задание.</p></div></div>
+  <div class="step-card"><div class="step-num">4</div><div class="step-content"><h4>Выполни задание</h4><p>Администратор пришлёт ссылку на компанию и текст отзыва. Оставь отзыв точно по инструкции.</p></div></div>
+  <div class="step-card"><div class="step-num">5</div><div class="step-content"><h4>Получи оплату</h4><p>Отправь скриншот опубликованного отзыва. После проверки деньги придут на твой кошелёк.</p></div></div>
+  <div class="divider"></div>
+  <h2>Оплата по платформам</h2>
+  <table class="price-table">
+    <thead><tr><th>Платформа</th><th>Оплата</th><th>Тип</th></tr></thead>
+    <tbody>
+      <tr><td>Авито</td><td class="price">150₽</td><td><span class="tag">С текстом</span></td></tr>
+      <tr><td>Я.Карты</td><td class="price">130₽</td><td><span class="tag">С текстом</span></td></tr>
+      <tr><td>Я.Браузер / Профи.ру / Отзовик</td><td class="price">60₽</td><td><span class="tag">С текстом</span></td></tr>
+      <tr><td>Гугл Карты</td><td class="price">30₽</td><td><span class="tag">С текстом</span></td></tr>
+      <tr><td>Оценка без текста (Яндекс)</td><td class="price">15₽</td><td><span class="tag">Без текста</span></td></tr>
+      <tr><td>2ГИС / ВКонтакте</td><td class="price">10₽</td><td><span class="tag">С текстом</span></td></tr>
+    </tbody>
+  </table>
+  <div class="warn-box"><span class="tip-icon">⚠️</span><p>Мы никогда не просим деньги у исполнителей. Если кто-то от имени Sombero просит оплату — это мошенники.</p></div>
+</div>
+
+<div id="p-pick" style="display:none">
+  <div class="breadcrumb"><a onclick="showPage('home')">Главная</a> › <span>Как брать задания</span></div>
+  <h1 class="article-title">Как брать задания</h1>
+  <div class="article-meta"><span>📖 ~2 мин</span></div>
+  <p>Задания публикуются в канале в виде постов. Каждый пост содержит: платформу, сумму оплаты и описание задания.</p>
+  <div class="divider"></div>
+  <h2>Как откликнуться</h2>
+  <div class="step-card"><div class="step-num">1</div><div class="step-content"><h4>Нажми «Откликнуться»</h4><p>Под каждым постом есть кнопка. Нажми её — откроется чат с администратором с уже готовым сообщением.</p></div></div>
+  <div class="step-card"><div class="step-num">2</div><div class="step-content"><h4>Отправь сообщение</h4><p>Просто нажми «Отправить». Администратор получит твоё сообщение и свяжется с тобой.</p></div></div>
+  <div class="step-card"><div class="step-num">3</div><div class="step-content"><h4>Дождись ответа</h4><p>Администратор проверит твой аккаунт и пришлёт детали задания: ссылку и текст отзыва.</p></div></div>
+  <div class="step-card"><div class="step-num">4</div><div class="step-content"><h4>Выполни и пришли скриншот</h4><p>Оставь отзыв, сделай скриншот опубликованного отзыва и отправь администратору.</p></div></div>
+  <div class="divider"></div>
+  <h2>Если не получается написать?</h2>
+  <p>Под постом есть кнопка <strong>«Не могу написать»</strong> — нажми её, и администратор свяжется сам. Либо напиши напрямую: <strong>@angel_sombero</strong></p>
+  <div class="warn-box"><span class="tip-icon">⚠️</span><p>Не бери задания, если не уверен что аккаунт подходит — уточни у администратора заранее.</p></div>
+  <div class="tip-box"><span class="tip-icon">💡</span><p>Задания разбираются быстро. Включи уведомления в канале чтобы не пропускать.</p></div>
+</div>
+
+<div id="p-req" style="display:none">
+  <div class="breadcrumb"><a onclick="showPage('home')">Главная</a> › <span>Требования к аккаунтам</span></div>
+  <h1 class="article-title">Требования к аккаунтам</h1>
+  <div class="article-meta"><span>📖 ~2 мин</span></div>
+  <p>Для выполнения заданий нужны живые аккаунты с историей. Новые аккаунты в большинстве случаев не подойдут — отзывы с них удаляются.</p>
+  <div class="divider"></div>
+  <h2>Общие требования</h2>
+  <ul class="req-list">
+    <li>Аккаунт зарегистрирован не менее 3–6 месяцев назад</li>
+    <li>На аккаунте есть хотя бы небольшая история активности</li>
+    <li>Аккаунт не заблокирован и не ограничен платформой</li>
+    <li>Нельзя использовать один аккаунт для нескольких заданий подряд на одной платформе</li>
+    <li>Фото профиля и заполненная информация — большой плюс</li>
+  </ul>
+  <div class="divider"></div>
+  <h2>По платформам</h2>
+  <div class="platform-card">
+    <div class="platform-card-header"><div class="platform-icon">🗺️</div><div><div class="platform-name">Я.Карты</div></div></div>
+    <ul class="req-list">
+      <li>Яндекс ID с историей использования сервисов</li>
+      <li>Желательно наличие 1–2 старых отзывов или оценок</li>
+      <li>Аккаунт не помечен как «подозрительный»</li>
+    </ul>
+  </div>
+  <div class="platform-card">
+    <div class="platform-card-header"><div class="platform-icon">🏷️</div><div><div class="platform-name">Авито</div></div></div>
+    <ul class="req-list">
+      <li>Аккаунт с историей — хотя бы несколько объявлений или сделок</li>
+      <li>Подтверждённый номер телефона</li>
+      <li>Рейтинг аккаунта не должен быть нулевым</li>
+    </ul>
+  </div>
+  <div class="platform-card">
+    <div class="platform-card-header"><div class="platform-icon">🌍</div><div><div class="platform-name">Гугл Карты</div></div></div>
+    <ul class="req-list">
+      <li>Google-аккаунт возрастом от 3 месяцев</li>
+      <li>Хотя бы несколько оценок или посещённых мест</li>
+      <li>Аккаунт с реальным именем</li>
+    </ul>
+  </div>
+  <div class="platform-card">
+    <div class="platform-card-header"><div class="platform-icon">📍</div><div><div class="platform-name">2ГИС / ВКонтакте</div></div></div>
+    <ul class="req-list">
+      <li>Аккаунт с активностью (посты, лайки, подписки)</li>
+      <li>Не заморожен и не ограничен</li>
+    </ul>
+  </div>
+  <div class="warn-box"><span class="tip-icon">⚠️</span><p>Если отзыв удалят из-за несоответствия требованиям — оплата не производится. Всегда уточняй у администратора перед выполнением.</p></div>
+</div>
+
+<div id="p-yandex" style="display:none">
+  <div class="breadcrumb"><a onclick="showPage('home')">Главная</a> › <span>Я.Карты</span></div>
+  <h1 class="article-title">Я.Карты — инструкция</h1>
+  <div class="article-meta"><span>💰 Оплата: 130₽</span></div>
+  <div class="platform-card">
+    <div class="platform-card-header"><div class="platform-icon">🗺️</div><div><div class="platform-name">Яндекс Карты</div><div style="font-size:12px;color:var(--text-muted);margin-top:3px">maps.yandex.ru</div></div></div>
+    <div class="platform-price">130₽</div><p style="font-size:13px;color:var(--text-muted);margin:0">за один отзыв с текстом</p>
+  </div>
+  <div class="divider"></div>
+  <h2>Как оставить отзыв</h2>
+  <div class="step-card"><div class="step-num">1</div><div class="step-content"><h4>Перейди по ссылке</h4><p>Администратор пришлёт ссылку на организацию в Яндекс Картах.</p></div></div>
+  <div class="step-card"><div class="step-num">2</div><div class="step-content"><h4>Нажми «Написать отзыв»</h4><p>Кнопка находится на странице организации. Войди в Яндекс ID если не авторизован.</p></div></div>
+  <div class="step-card"><div class="step-num">3</div><div class="step-content"><h4>Поставь 5 звёзд и напиши текст</h4><p>Используй текст от администратора или напиши своими словами на его основе. Минимум 3–4 предложения.</p></div></div>
+  <div class="step-card"><div class="step-num">4</div><div class="step-content"><h4>Опубликуй и сделай скриншот</h4><p>После публикации сделай скриншот страницы с твоим отзывом и отправь администратору.</p></div></div>
+  <div class="tip-box"><span class="tip-icon">💡</span><p>Яндекс проверяет отзыв — от нескольких минут до суток. Скриншот делай сразу после отправки.</p></div>
+  <div class="warn-box"><span class="tip-icon">⚠️</span><p>Не копируй текст дословно — Яндекс может не принять. Пиши немного по-другому.</p></div>
+</div>
+
+<div id="p-avito" style="display:none">
+  <div class="breadcrumb"><a onclick="showPage('home')">Главная</a> › <span>Авито</span></div>
+  <h1 class="article-title">Авито — инструкция</h1>
+  <div class="article-meta"><span>💰 Оплата: 150₽</span></div>
+  <div class="platform-card">
+    <div class="platform-card-header"><div class="platform-icon">🏷️</div><div><div class="platform-name">Авито</div><div style="font-size:12px;color:var(--text-muted);margin-top:3px">avito.ru</div></div></div>
+    <div class="platform-price">150₽</div><p style="font-size:13px;color:var(--text-muted);margin:0">самая высокая оплата среди платформ</p>
+  </div>
+  <div class="divider"></div>
+  <h2>Как оставить отзыв</h2>
+  <div class="step-card"><div class="step-num">1</div><div class="step-content"><h4>Перейди по ссылке на профиль</h4><p>Администратор пришлёт ссылку на профиль продавца или компании на Авито.</p></div></div>
+  <div class="step-card"><div class="step-num">2</div><div class="step-content"><h4>Нажми «Оставить отзыв»</h4><p>Кнопка в профиле в разделе «Отзывы». Необходима авторизация в аккаунте Авито.</p></div></div>
+  <div class="step-card"><div class="step-num">3</div><div class="step-content"><h4>Напиши текст и поставь оценку</h4><p>Максимальная оценка + текст на основе присланного от администратора.</p></div></div>
+  <div class="step-card"><div class="step-num">4</div><div class="step-content"><h4>Пришли скриншот</h4><p>Скриншот опубликованного отзыва — администратору для проверки.</p></div></div>
+  <div class="warn-box"><span class="tip-icon">⚠️</span><p>Авито требует историю аккаунта. Новые аккаунты без сделок могут не пропустить отзыв.</p></div>
+  <div class="tip-box"><span class="tip-icon">💡</span><p>Отзыв на Авито проходит модерацию — обычно 1–3 часа.</p></div>
+</div>
+
+<div id="p-google" style="display:none">
+  <div class="breadcrumb"><a onclick="showPage('home')">Главная</a> › <span>Гугл Карты</span></div>
+  <h1 class="article-title">Гугл Карты — инструкция</h1>
+  <div class="article-meta"><span>💰 Оплата: 30₽</span></div>
+  <div class="platform-card">
+    <div class="platform-card-header"><div class="platform-icon">🌍</div><div><div class="platform-name">Google Maps</div><div style="font-size:12px;color:var(--text-muted);margin-top:3px">maps.google.com</div></div></div>
+    <div class="platform-price">30₽</div><p style="font-size:13px;color:var(--text-muted);margin:0">за один отзыв с текстом</p>
+  </div>
+  <div class="divider"></div>
+  <h2>Как оставить отзыв</h2>
+  <div class="step-card"><div class="step-num">1</div><div class="step-content"><h4>Перейди по ссылке</h4><p>Администратор пришлёт ссылку на организацию в Google Картах.</p></div></div>
+  <div class="step-card"><div class="step-num">2</div><div class="step-content"><h4>Прокрути вниз до раздела «Отзывы»</h4><p>Нажми «Написать отзыв». Войди в Google-аккаунт если необходимо.</p></div></div>
+  <div class="step-card"><div class="step-num">3</div><div class="step-content"><h4>Поставь 5 звёзд и напиши текст</h4><p>Минимум 2–3 предложения своими словами на основе присланного.</p></div></div>
+  <div class="step-card"><div class="step-num">4</div><div class="step-content"><h4>Опубликуй и пришли скриншот</h4><p>Скриншот с отображением твоего отзыва — администратору.</p></div></div>
+  <div class="tip-box"><span class="tip-icon">💡</span><p>В Google отзывы появляются практически мгновенно. Отличная платформа для новичков.</p></div>
+</div>
+
+<div id="p-2gis" style="display:none">
+  <div class="breadcrumb"><a onclick="showPage('home')">Главная</a> › <span>2ГИС</span></div>
+  <h1 class="article-title">2ГИС — инструкция</h1>
+  <div class="article-meta"><span>💰 Оплата: 10₽</span></div>
+  <div class="platform-card">
+    <div class="platform-card-header"><div class="platform-icon">📍</div><div><div class="platform-name">2ГИС</div><div style="font-size:12px;color:var(--text-muted);margin-top:3px">2gis.ru</div></div></div>
+    <div class="platform-price">10₽</div><p style="font-size:13px;color:var(--text-muted);margin:0">за один отзыв</p>
+  </div>
+  <div class="divider"></div>
+  <h2>Как оставить отзыв</h2>
+  <div class="step-card"><div class="step-num">1</div><div class="step-content"><h4>Перейди по ссылке</h4><p>Администратор пришлёт ссылку на организацию в 2ГИС.</p></div></div>
+  <div class="step-card"><div class="step-num">2</div><div class="step-content"><h4>Нажми «Оставить отзыв»</h4><p>Кнопка на карточке организации. Авторизуйся через номер телефона или соцсеть.</p></div></div>
+  <div class="step-card"><div class="step-num">3</div><div class="step-content"><h4>5 звёзд + текст</h4><p>Текст от администратора, немного переформулированный.</p></div></div>
+  <div class="step-card"><div class="step-num">4</div><div class="step-content"><h4>Пришли скриншот</h4><p>Скриншот опубликованного отзыва администратору.</p></div></div>
+  <div class="tip-box"><span class="tip-icon">💡</span><p>2ГИС хорошо подходит для начинающих — требования к аккаунтам не такие строгие как у Яндекса.</p></div>
+</div>
+
+<div id="p-vk" style="display:none">
+  <div class="breadcrumb"><a onclick="showPage('home')">Главная</a> › <span>ВКонтакте</span></div>
+  <h1 class="article-title">ВКонтакте — инструкция</h1>
+  <div class="article-meta"><span>💰 Оплата: 10₽</span></div>
+  <div class="platform-card">
+    <div class="platform-card-header"><div class="platform-icon">💙</div><div><div class="platform-name">ВКонтакте</div><div style="font-size:12px;color:var(--text-muted);margin-top:3px">vk.com</div></div></div>
+    <div class="platform-price">10₽</div><p style="font-size:13px;color:var(--text-muted);margin:0">за один отзыв</p>
+  </div>
+  <div class="divider"></div>
+  <h2>Как оставить отзыв</h2>
+  <div class="step-card"><div class="step-num">1</div><div class="step-content"><h4>Перейди по ссылке на сообщество</h4><p>Администратор пришлёт ссылку на группу или бизнес-страницу ВКонтакте.</p></div></div>
+  <div class="step-card"><div class="step-num">2</div><div class="step-content"><h4>Найди раздел «Отзывы»</h4><p>Обычно в меню группы или на главной странице. Нажми «Написать отзыв».</p></div></div>
+  <div class="step-card"><div class="step-num">3</div><div class="step-content"><h4>Напиши отзыв</h4><p>5 звёзд + текст своими словами на основе присланного от администратора.</p></div></div>
+  <div class="step-card"><div class="step-num">4</div><div class="step-content"><h4>Пришли скриншот</h4><p>Скриншот с опубликованным отзывом — администратору.</p></div></div>
+  <div class="warn-box"><span class="tip-icon">⚠️</span><p>Аккаунт ВКонтакте должен быть живым — с подписками, постами или историей. Пустые аккаунты не подходят.</p></div>
+</div>
+
+<div id="p-profi" style="display:none">
+  <div class="breadcrumb"><a onclick="showPage('home')">Главная</a> › <span>Профи.ру / Отзовик</span></div>
+  <h1 class="article-title">Профи.ру и Отзовик</h1>
+  <div class="article-meta"><span>💰 Оплата: 60₽</span></div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div class="platform-card" style="flex:1;min-width:180px"><div class="platform-card-header"><div class="platform-icon">🛠️</div><div><div class="platform-name">Профи.ру</div></div></div><div class="platform-price">60₽</div></div>
+    <div class="platform-card" style="flex:1;min-width:180px"><div class="platform-card-header"><div class="platform-icon">💬</div><div><div class="platform-name">Отзовик</div></div></div><div class="platform-price">60₽</div></div>
+  </div>
+  <div class="divider"></div>
+  <h2>Профи.ру</h2>
+  <div class="step-card"><div class="step-num">1</div><div class="step-content"><h4>Перейди по ссылке</h4><p>Администратор пришлёт ссылку на профиль мастера или компании.</p></div></div>
+  <div class="step-card"><div class="step-num">2</div><div class="step-content"><h4>Нажми «Оставить отзыв»</h4><p>Авторизуйся в аккаунте Профи.ру. Если аккаунта нет — уточни у администратора.</p></div></div>
+  <div class="step-card"><div class="step-num">3</div><div class="step-content"><h4>Напиши текст и оцени</h4><p>Текст от администратора немного перефразируй. Ставь максимальную оценку.</p></div></div>
+  <div class="divider"></div>
+  <h2>Отзовик</h2>
+  <div class="step-card"><div class="step-num">1</div><div class="step-content"><h4>Войди в аккаунт</h4><p>Перейди на otzovik.com и авторизуйся.</p></div></div>
+  <div class="step-card"><div class="step-num">2</div><div class="step-content"><h4>Найди нужный товар/компанию</h4><p>Администратор пришлёт прямую ссылку. Нажми «Написать отзыв».</p></div></div>
+  <div class="step-card"><div class="step-num">3</div><div class="step-content"><h4>Напиши развёрнутый отзыв</h4><p>На Отзовике важен объём — минимум 5–6 предложений: плюсы, минусы, общее впечатление.</p></div></div>
+  <div class="tip-box"><span class="tip-icon">💡</span><p>На Отзовике отзывы проходят модерацию — могут одобрить в течение суток. Скриншот делай сразу после отправки.</p></div>
+</div>
+
+<div id="p-pay" style="display:none">
+  <div class="breadcrumb"><a onclick="showPage('home')">Главная</a> › <span>Как получить выплату</span></div>
+  <h1 class="article-title">Как получить выплату</h1>
+  <div class="article-meta"><span>💸 Выплаты</span></div>
+  <p>Выплаты производятся после проверки выполненного задания администратором.</p>
+  <div class="divider"></div>
+  <h2>Шаги</h2>
+  <div class="step-card"><div class="step-num">1</div><div class="step-content"><h4>Выполни задание</h4><p>Оставь отзыв согласно инструкции.</p></div></div>
+  <div class="step-card"><div class="step-num">2</div><div class="step-content"><h4>Сделай скриншот</h4><p>На скриншоте должен быть виден опубликованный отзыв, имя аккаунта и дата публикации.</p></div></div>
+  <div class="step-card"><div class="step-num">3</div><div class="step-content"><h4>Отправь скриншот администратору</h4><p>В тот же чат, где получал задание.</p></div></div>
+  <div class="step-card"><div class="step-num">4</div><div class="step-content"><h4>Получи деньги</h4><p>После проверки администратор переводит оплату на указанные тобой реквизиты.</p></div></div>
+  <div class="divider"></div>
+  <h2>Способы получения</h2>
+  <table class="price-table">
+    <thead><tr><th>Способ</th><th>Срок</th></tr></thead>
+    <tbody>
+      <tr><td>СБП (по номеру телефона)</td><td>Мгновенно</td></tr>
+      <tr><td>Карта любого банка</td><td>До 1 часа</td></tr>
+      <tr><td>ЮMoney / QIWI</td><td>До 1 часа</td></tr>
+    </tbody>
+  </table>
+  <div class="warn-box"><span class="tip-icon">⚠️</span><p>Если отзыв был удалён платформой — оплата не производится. Убедись что аккаунт соответствует требованиям.</p></div>
+  <div class="success-box"><span class="tip-icon">✅</span><p>Мы всегда платим честно и в срок. Сотни исполнителей уже получили выплаты!</p></div>
+</div>
+
+<div id="p-terms" style="display:none">
+  <div class="breadcrumb"><a onclick="showPage('home')">Главная</a> › <span>Условия и сроки</span></div>
+  <h1 class="article-title">Условия и сроки выплат</h1>
+  <div class="article-meta"><span>⏱️ Важно знать</span></div>
+  <div class="divider"></div>
+  <h2>Минимальная сумма</h2>
+  <p>Минимальной суммы для вывода нет — оплата производится после каждого выполненного задания.</p>
+  <div class="success-box"><span class="tip-icon">✅</span><p>Выполнил одно задание — сразу получаешь оплату. Копить не нужно.</p></div>
+  <div class="divider"></div>
+  <h2>Сроки проверки</h2>
+  <table class="price-table">
+    <thead><tr><th>Этап</th><th>Срок</th></tr></thead>
+    <tbody>
+      <tr><td>Проверка скриншота</td><td>До 2 часов</td></tr>
+      <tr><td>Перевод после проверки</td><td>До 1 часа</td></tr>
+      <tr><td>В выходные дни</td><td>До 24 часов</td></tr>
+    </tbody>
+  </table>
+  <div class="divider"></div>
+  <h2>Когда оплата не производится</h2>
+  <ul class="req-list">
+    <li>Отзыв был удалён платформой до проверки</li>
+    <li>Скриншот нечёткий или не содержит нужной информации</li>
+    <li>Отзыв написан не по инструкции от администратора</li>
+    <li>Аккаунт не соответствовал требованиям (не предупредил заранее)</li>
+  </ul>
+  <div class="tip-box"><span class="tip-icon">💡</span><p>Если есть вопросы по выплате — напиши в поддержку. Разберёмся в любой ситуации.</p></div>
+</div>
+
+<div id="p-faq" style="display:none">
+  <div class="breadcrumb"><a onclick="showPage('home')">Главная</a> › <span>FAQ</span></div>
+  <h1 class="article-title">Частые вопросы</h1>
+  <div class="article-meta"><span>❓ FAQ</span></div>
+  <div class="divider"></div>
+  <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Нужно ли платить за доступ к заданиям?<span class="faq-arrow">▼</span></div><div class="faq-a">Нет. Доступ к заданиям абсолютно бесплатный. Мы никогда не берём деньги с исполнителей.</div></div>
+  <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Можно ли брать несколько заданий сразу?<span class="faq-arrow">▼</span></div><div class="faq-a">Да, можно выполнять несколько заданий. Но одним аккаунтом нельзя оставлять несколько отзывов подряд на одной платформе — они могут быть удалены.</div></div>
+  <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Что делать если отзыв удалили?<span class="faq-arrow">▼</span></div><div class="faq-a">Сообщи администратору. Если аккаунт соответствовал требованиям и всё сделано правильно — рассмотрим вопрос компенсации индивидуально.</div></div>
+  <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Как часто появляются задания?<span class="faq-arrow">▼</span></div><div class="faq-a">Задания публикуются регулярно. Включи уведомления в канале @millionnovosti, чтобы не пропускать.</div></div>
+  <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Нужно ли придумывать текст самому?<span class="faq-arrow">▼</span></div><div class="faq-a">Администратор присылает готовый текст или тезисы. Нужно написать своими словами — не копируй дословно, немного перефразируй.</div></div>
+  <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Как быстро приходит оплата?<span class="faq-arrow">▼</span></div><div class="faq-a">После проверки скриншота — обычно в течение 1–2 часов. В выходные возможна задержка до 24 часов.</div></div>
+  <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Можно ли работать из другого города?<span class="faq-arrow">▼</span></div><div class="faq-a">Да, местоположение не важно. Задания выполняются онлайн — достаточно интернета и подходящего аккаунта.</div></div>
+  <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Есть ли реферальная программа?<span class="faq-arrow">▼</span></div><div class="faq-a">Уточняй у администратора — условия могут меняться. Напиши в поддержку для актуальной информации.</div></div>
+</div>
+
+<div id="p-support" style="display:none">
+  <div class="breadcrumb"><a onclick="showPage('home')">Главная</a> › <span>Поддержка</span></div>
+  <h1 class="article-title">Поддержка</h1>
+  <div class="article-meta"><span>💬 Мы всегда на связи</span></div>
+  <p>Если у тебя возникли вопросы или проблемы — не стесняйся писать. Отвечаем быстро.</p>
+  <div class="divider"></div>
+  <h2>Как связаться</h2>
+  <div class="step-card"><div class="step-num">💬</div><div class="step-content"><h4>Telegram</h4><p>Напиши администратору напрямую: <strong>@angel_sombero</strong></p></div></div>
+  <div class="step-card"><div class="step-num">📢</div><div class="step-content"><h4>Канал с заданиями</h4><p>Следи за заданиями: <strong>@millionnovosti</strong></p></div></div>
+  <div class="divider"></div>
+  <h2>Время работы</h2>
+  <table class="price-table">
+    <thead><tr><th>День</th><th>Время</th></tr></thead>
+    <tbody>
+      <tr><td>Пн — Пт</td><td>9:00 — 22:00</td></tr>
+      <tr><td>Сб — Вс</td><td>10:00 — 20:00</td></tr>
+    </tbody>
+  </table>
+  <div class="tip-box"><span class="tip-icon">💡</span><p>Прежде чем писать — проверь <a onclick="showPage('faq')" style="color:var(--accent);cursor:pointer">FAQ</a>. Возможно, ответ уже там.</p></div>
+</div>
+
+</main>
+</div>
+<script>
+const pages = ['home','start','pick','req','yandex','avito','google','2gis','vk','profi','pay','terms','faq','support'];
+function showPage(id, el) {
+  pages.forEach(p => { const el = document.getElementById('p-'+p); if(el) el.style.display='none'; });
+  const page = document.getElementById('p-'+id);
+  if(page) page.style.display='block';
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.querySelector('aside').classList.remove('open');
+  window.scrollTo(0,0);
+}
+function toggleFaq(el) {
+  el.nextElementSibling.classList.toggle('open');
+  el.querySelector('.faq-arrow').classList.toggle('open');
+}
+</script>
+</body>
+</html>
